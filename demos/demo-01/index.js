@@ -8,42 +8,53 @@ const express = require("express"); // Import the Express module
 
 const app = express(); // Create an Express application
 
+app.use(express.json()); // Middleware to parse JSON request bodies
+
 // Start the server and listen on port 3000. The callback runs once the server is ready.
 app.listen(3000, () => {
   console.log("Express JS Backend running on http://localhost:3000");
 });
 
-// Root route: responds with a plain text welcome message.
-app.get("/", (request, response) => {
-  response.send("Welcome to Express JS!!");
-});
-
-// About route: another example of a text response for a different endpoint.
-app.get("/about", (request, response) => {
-  response.send("Response from About API EndPoint!!");
-});
+let users = []; // In-memory storage for users (simulates a database)
 
 // Users route: responds with a JSON array of user objects.
 // Using `response.json()` automatically sets the Content-Type to application/json
-app.get("/users", (request, response) => {
-  response.json([
-    {
-      id: 100,
-      name: "Nadeem Khan",
-    },
-    {
-      id: 101,
-      name: "Arif Attar",
-    },
-  ]);
+// GET /users: Retrieve all users as a JSON array
+app.get("/users", (req, res) => {
+  res.json(users);
 });
 
-// Specific user route: returns a single user object as JSON.
-// Note: This route is hard-coded for user id 101 for demonstration purposes.
-// In real applications you would capture route params (e.g., '/users/:id') and fetch data dynamically.
-app.get("/users/101", (request, response) => {
-  response.json({
-    id: 101,
-    name: "Arif Attar",
+// POST /users: Create a new user
+app.post("/users", (request, response) => {
+  let userData = request.body; // Extract user data from the request body
+  console.log("User Data Received:", userData); // Log received data for debugging
+  userData.id = users.length + 1; // Assign a unique ID to the new user
+  users.push(userData); // Add the user to the in-memory array
+
+  response.status(201).json({
+    // Respond with 201 Created status and JSON
+    message: "User created successfully",
+    user: userData,
   });
 });
+
+
+
+// // GET /: Root endpoint that returns a welcome message
+// app.get("/", (request, response) => {
+//   response.send("Welcome to Express JS!!");
+// });
+
+// // GET /about: About page endpoint
+// app.get("/about", (request, response) => {
+//   response.send("Response from About API EndPoint!!");
+// });
+
+// // GET /users/101: Retrieve a specific user (hard-coded for demo purposes)
+// // Note: In a real application, use route parameters like '/users/:id' to fetch dynamically
+// app.get("/users/101", (request, response) => {
+//   response.json({
+//     id: 101,
+//     name: "Arif Attar",
+//   });
+// });
