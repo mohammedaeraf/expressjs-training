@@ -22,10 +22,7 @@ app.use(express.json()); // Middleware to parse JSON request bodies
 
 // Connect to MongoDB using connection string from environment variables
 mongoose
-  .connect(process.env.MONGODB_URI_BOOKSTORE, {
-    useNewUrlParser: true, // Use new URL parser to avoid deprecation warning
-    useUnifiedTopology: true, // Use new server discovery and monitoring engine
-  })
+  .connect(process.env.MONGODB_URI_BOOKSTORE)
   .then(() => console.log("✅ Connected to MongoDB"))
   .catch((err) => console.error("❌ MongoDB connection error:", err));
 
@@ -44,8 +41,8 @@ mongoose
 
 app.get("/api/books", async (req, res) => {
   try {
-    const books = await Book.find(); // Retrieve all posts
-    res.json(books); // Send posts as JSON response
+    const books = await Book.find(); // Retrieve all books
+    res.json(books); // Send books as JSON response
   } catch (err) {
     res.status(500).json({ error: "Failed to fetch books" });
   }
