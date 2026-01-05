@@ -24,10 +24,41 @@ app.get("/users", (req, res) => {
   res.json(users);
 });
 
+app.get("/users/:id", (req, res) => {
+  const id = parseInt(req.params.id);
+  const userObj = users.find((user) => user.id === id);
+  if (!userObj) {
+    res.statusCode = 404;
+    res.json({
+      message: "User not found!",
+    });
+  } else {
+    res.statusCode = 200;
+    res.json(userObj);
+  }
+});
+
+app.delete("/users/:id", (req, res) => {
+  const id = parseInt(req.params.id);
+  const userObj = users.find((user) => user.id === id);
+  if (!userObj) {
+    res.statusCode = 404;
+    res.json({
+      message: "User not found!",
+    });
+  } else {
+    const index = users.indexOf(userObj); // [1,2,3]
+    users.splice(index, 1);
+    res.json({
+      message: "User deleted successfully",
+    });
+  }
+});
+
 // POST /users: Create a new user
 app.post("/users", (request, response) => {
   let userData = request.body; // Extract user data from the request body
-  console.log("User Data Received:", userData); // Log received data for debugging
+  // console.log("User Data Received:", userData); // Log received data for debugging
   userData.id = users.length + 1; // Assign a unique ID to the new user
   users.push(userData); // Add the user to the in-memory array
 
@@ -38,9 +69,7 @@ app.post("/users", (request, response) => {
   });
 });
 
-
-
-// // GET /: Root endpoint that returns a welcome message
+// GET /: Root endpoint that returns a welcome message
 // app.get("/", (request, response) => {
 //   response.send("Welcome to Express JS!!");
 // });
