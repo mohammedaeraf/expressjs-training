@@ -82,6 +82,29 @@ app.post("/users", (request, response) => {
   });
 });
 
+
+app.put("/users/:id", (req, res) => {
+  const id = parseInt(req.params.id);
+
+  // Find the user object with the matching ID
+  const userObj = users.find((user) => user.id === id);
+  // If user not found, return a 404 error with a message
+  if (!userObj) {
+    return res.status(404).json({
+      message: "User not found!",
+    });
+  }
+
+  const userRequest = req.body;
+  userObj.name = userRequest.name;
+  userObj.email = userRequest.email;
+
+  res.json({
+    message: "User updated succesffuly",
+    user: userObj,
+  });
+});
+
 // GET /: Root endpoint that returns a welcome message
 // app.get("/", (request, response) => {
 //   response.send("Welcome to Express JS!!");
