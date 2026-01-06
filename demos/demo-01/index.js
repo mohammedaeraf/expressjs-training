@@ -82,8 +82,9 @@ app.post("/users", (request, response) => {
   });
 });
 
-
+// PUT /users/:id: Update an existing user
 app.put("/users/:id", (req, res) => {
+  // Parse the user ID from the URL parameters
   const id = parseInt(req.params.id);
 
   // Find the user object with the matching ID
@@ -95,12 +96,14 @@ app.put("/users/:id", (req, res) => {
     });
   }
 
+  // Update user details from the request body
   const userRequest = req.body;
   userObj.name = userRequest.name;
   userObj.email = userRequest.email;
 
+  // Respond with a success message and the updated user object
   res.json({
-    message: "User updated succesffuly",
+    message: "User updated successfully",
     user: userObj,
   });
 });
