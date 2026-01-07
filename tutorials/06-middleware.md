@@ -42,7 +42,7 @@ Middleware can:
 
 ---
 
-## 🧠 Real-Life Analogy (Students Love This)
+## 🧠 Real-Life Analogy
 
 Think of middleware like **security at a building entrance**:
 

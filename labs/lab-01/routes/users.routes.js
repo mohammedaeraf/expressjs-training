@@ -1,44 +1,16 @@
 const express = require("express");
 const router = express.Router();
+const validateCustomer = require("../middlewares/validateCustomer");
 
 let users = [];
 
-router.post("/", (request, response) => {
-  const userData = request.body;
-
-  if (!userData.email || !userData.name) {
-    return response.status(400).json({
-      message: "User name and email are required!",
-    });
-  }
-
-  const validator = require("validator");
-
-  if (!validator.isEmail(userData.email)) {
-    return response.status(400).json({
-      message: "Email is not in correct format",
-    });
-  }
-
-  const age = userData.age;
-  if (age === undefined || !Number.isInteger(age) || age < 18 || age > 100)
-  {
-    return response.status(400).json({
-      message: "Age should be a number between 18 to 100"
-    })
-  }
-
-  dob = userData.dob;
-  if (!dob || !validator.isDate(dob)) {
-    return response.status(400).json({
-      message: "Invalid Date of Birth"
-    })
-  }
+router.post("/", validateCustomer, (req, res) => {
+  const userData = req.body;
 
   userData.id = users.length + 1;
   users.push(userData);
 
-  response.status(201).json({
+  res.status(201).json({
     message: "User created successfully",
     user: userData,
   });
