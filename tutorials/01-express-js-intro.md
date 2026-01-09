@@ -1,7 +1,3 @@
-Here’s a **beginner-friendly, classroom-ready tutorial** you can directly use with students who already know **JavaScript / TypeScript**.
-
----
-
 # 🚀 Express.js – Beginner Tutorial
 
 ## 🎯 What You Will Learn
