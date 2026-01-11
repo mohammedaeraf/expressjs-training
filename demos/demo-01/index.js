@@ -24,6 +24,7 @@ app.get("/users", (req, res) => {
   res.json(users);
 });
 
+// GET /users/:id: Retrieve a specific user by ID
 app.get("/users/:id", (req, res) => {
   // Parse the user ID from the URL parameters
   const id = parseInt(req.params.id);
@@ -42,6 +43,7 @@ app.get("/users/:id", (req, res) => {
   }
 });
 
+// DELETE /users/:id: Delete a user by ID
 app.delete("/users/:id", (req, res) => {
   // Parse the user ID from the URL parameters
   const id = parseInt(req.params.id);
@@ -65,17 +67,46 @@ app.delete("/users/:id", (req, res) => {
 });
 
 // POST /users: Create a new user
-app.post("/users", (request, response) => {
+app.post("/users", (req, res) => {
   // Extract user data from the JSON request body
-  let userData = request.body; // Extract user data from the request body
-  // console.log("User Data Received:", userData); // Log received data for debugging
-  // Assign a unique ID based on the current length of the users array
+  let userData = req.body; // Extract user data from the request body
+  let validator = require("validator");
+  // Perform input validations
+  // Validate name: must be at least 3 characters
+  if (!userData.name || userData.name.trim().length <= 3) {
+    return res.status(400).json({
+      message: "Name should be at least 3 characters",
+    });
+  }
+
+  // Validate email: must be present and in valid format
+  if (!userData.email || !validator.isEmail(userData.email)) {
+    return res.status(400).json({
+      message: "Email cannot be blank and should be in correct format",
+    });
+  }
+
+  // Validate phone: must be present and valid Indian mobile number
+  const phone = userData.phone;
+  if (!phone || !validator.isMobilePhone(phone, "en-IN")) {
+    return res.status(400).json({
+      message: "Phone number should be correct",
+    });
+  }
+  // Validate age: must be an integer between 18 and 100
+  const age = userData.age;
+  if (age === undefined || !Number.isInteger(age) || age << 18 || age > 100) {
+    return res.status(400).json({
+      message: "Age should be between 18 and 100",
+    });
+  }
+
   userData.id = users.length + 1; // Assign a unique ID to the new user
   // Add the new user to the in-memory array
   users.push(userData); // Add the user to the in-memory array
 
   // Respond with 201 Created status and JSON containing success message and user data
-  response.status(201).json({
+  res.status(201).json({
     // Respond with 201 Created status and JSON
     message: "User created successfully",
     user: userData,
