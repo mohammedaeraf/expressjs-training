@@ -1,11 +1,15 @@
+// Demo router: simple in-memory CRUD for learning purposes.
+// NOTE: This is for demo only — it does NOT persist data to a database and is not suitable for production.
 const express = require("express");
+// Middleware that validates incoming customer data (used by POST and PUT handlers)
 const validateCustomer = require("../middlewares/validateCustomer");
 const router = express.Router();
 
+// In-memory users store (array of user objects with at least `id`, `name`, `email`)
 let users = []; // In-memory storage for users (simulates a database)
-// Users route: responds with a JSON array of user objects.
-// Using `response.json()` automatically sets the Content-Type to application/json
-// GET /users: Retrieve all users as a JSON array
+
+// GET /users - Return all users as JSON
+// Using `res.json()` sets Content-Type: application/json and stringifies the array
 router.get("/", (req, res) => {
   res.json(users);
 });
@@ -53,16 +57,18 @@ router.delete("/:id", (req, res) => {
 });
 
 // POST /users: Create a new user
+// validateCustomer middleware ensures required fields (e.g., name, email) are present and valid
 router.post("/", validateCustomer, (req, res) => {
-  // Extract user data from the JSON request body
-  
+  // Extract user data from the JSON request body (provided by express.json() in app)
+  const userData = req.body;
+
+  // Assign a simple incremental id (okay for demo, not for real concurrency)
   userData.id = users.length + 1; // Assign a unique ID to the new user
   // Add the new user to the in-memory array
-  users.push(userData); // Add the user to the in-memory array
+  users.push(userData);
 
   // Respond with 201 Created status and JSON containing success message and user data
   res.status(201).json({
-    // Respond with 201 Created status and JSON
     message: "User created successfully",
     user: userData,
   });
@@ -82,8 +88,9 @@ router.put("/:id", validateCustomer, (req, res) => {
     });
   }
 
-  // Update user details from the request body
+  // Update user details from the request body (validated by middleware)
   const userRequest = req.body;
+  // Overwrite allowed fields (name and email) from the request
   userObj.name = userRequest.name;
   userObj.email = userRequest.email;
 
@@ -94,6 +101,7 @@ router.put("/:id", validateCustomer, (req, res) => {
   });
 });
 
+// Export the configured router to be mounted by the main app (e.g., app.use('/users', usersRouter))
 module.exports = router;
 
 // logging, validation, authentication => middleware

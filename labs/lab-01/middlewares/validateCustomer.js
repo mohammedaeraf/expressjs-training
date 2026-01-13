@@ -7,7 +7,7 @@ const validateCustomer = (req, res, next) => {
       message: "Name cannot be blank or less than 3 characters",
     });
   }
-  if (!user.email) {
+  if (!user.email) { 
     console.log("Validation for email in middleware");
 
     return res.status(400).json({
