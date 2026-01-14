@@ -15,6 +15,17 @@ By the end of this tutorial, students will:
 
 **REST** = Representational State Transfer
 
+### Let's Breakdown the Term
+
+* `Representational` → You don’t send the actual resource (like a database row or a file). Instead, you send a representation of it (JSON, XML, HTML, etc.).
+
+* `State` → The resource has a current condition or "state" (e.g., a student record with name, age, grade).
+
+* `Transfer` → That representation of the resource’s state is transferred between client and server over HTTP.
+
+👉 Example:
+If a student record exists in the database, a GET /students/1 request transfers a representation of that student’s state (like {"name":"Ana","grade":"A"}) to the client.
+
 A REST API:
 
 * Uses **HTTP**
