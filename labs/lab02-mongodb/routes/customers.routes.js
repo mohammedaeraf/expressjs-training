@@ -14,7 +14,6 @@ router.get("/", async (req, res) => {
   }
 });
 
-
 // ===============================
 // POST – Create Customer
 // ===============================
@@ -25,16 +24,42 @@ router.post("/", async (req, res) => {
 
     res.status(201).json({
       message: "Customer created successfully",
-      data: savedCustomer
+      data: savedCustomer,
     });
   } catch (error) {
     res.status(400).json({
       message: "Failed to create customer",
-      error: error.message
+      error: error.message,
     });
   }
 });
 
+router.get("/search", async (req, res) => {
+  try {
+    const { email, phone } = req.query;
+
+    let filter = {};
+
+    if (email) {
+      filter.email = email;
+    }
+
+    if (phone) {
+      filter.phone = phone;
+    }
+
+    const customers = await Customer.find(filter);
+
+    res.status(200).json({
+      totalResults: customers.length,
+      data: customers,
+    });
+  } catch (error) {
+    res.status(500).json({
+      message: "Search failed",
+    });
+  }
+});
 
 // ===============================
 // GET – Customer by ID
@@ -45,18 +70,17 @@ router.get("/:id", async (req, res) => {
 
     if (!customer) {
       return res.status(404).json({
-        message: "Customer not found"
+        message: "Customer not found",
       });
     }
 
     res.status(200).json(customer);
   } catch (error) {
     res.status(400).json({
-      message: "Invalid customer ID"
+      message: "Invalid customer ID",
     });
   }
 });
-
 
 // ===============================
 // PUT – Update Customer
@@ -71,22 +95,21 @@ router.put("/:id", async (req, res) => {
 
     if (!updatedCustomer) {
       return res.status(404).json({
-        message: "Customer not found"
+        message: "Customer not found",
       });
     }
 
     res.status(200).json({
       message: "Customer updated successfully",
-      data: updatedCustomer
+      data: updatedCustomer,
     });
   } catch (error) {
     res.status(400).json({
       message: "Failed to update customer",
-      error: error.message
+      error: error.message,
     });
   }
 });
-
 
 // ===============================
 // DELETE – Customer
@@ -97,16 +120,16 @@ router.delete("/:id", async (req, res) => {
 
     if (!deletedCustomer) {
       return res.status(404).json({
-        message: "Customer not found"
+        message: "Customer not found",
       });
     }
 
     res.status(200).json({
-      message: "Customer deleted successfully"
+      message: "Customer deleted successfully",
     });
   } catch (error) {
     res.status(400).json({
-      message: "Invalid customer ID"
+      message: "Invalid customer ID",
     });
   }
 });
