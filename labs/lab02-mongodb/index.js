@@ -2,10 +2,12 @@ require("dotenv").config();
 
 let express = require("express");
 let mongoose = require("mongoose");
+let cors = require("cors");
 let mongoDBUrl = process.env.MONGODB_URL_ACCOUNTING_DB;
 
 let app = express();
 app.use(express.json());
+app.use(cors());
 
 mongoose
   .connect(mongoDBUrl)
