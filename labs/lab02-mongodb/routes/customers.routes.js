@@ -70,58 +70,58 @@ const Customer = require("../models/Customer");
 // ===============================
 // GET – Customers (Sorting + Pagination)
 // ===============================
-router.get("/", async (req, res) => {
-  try {
-    // 1️⃣ Read query params
-    const page = parseInt(req.query.page) || 1;
-    const limit = parseInt(req.query.limit) || 10;
-    const sortBy = req.query.sortBy || "createdAt";
-    const order = req.query.order === "asc" ? 1 : -1;
+// router.get("/", async (req, res) => {
+//   try {
+//     // 1️⃣ Read query params
+//     const page = parseInt(req.query.page) || 1;
+//     const limit = parseInt(req.query.limit) || 10;
+//     const sortBy = req.query.sortBy || "createdAt";
+//     const order = req.query.order === "asc" ? 1 : -1;
 
-    // 2️⃣ Calculate skip
-    const skip = (page - 1) * limit;
+//     // 2️⃣ Calculate skip
+//     const skip = (page - 1) * limit;
 
-    // 3️⃣ Fetch data
-    const customers = await Customer.find()
-      .sort({ [sortBy]: order })
-      .skip(skip)
-      .limit(limit);
+//     // 3️⃣ Fetch data
+//     const customers = await Customer.find()
+//       .sort({ [sortBy]: order })
+//       .skip(skip)
+//       .limit(limit);
 
-    // 4️⃣ Total count
-    const totalCustomers = await Customer.countDocuments();
+//     // 4️⃣ Total count
+//     const totalCustomers = await Customer.countDocuments();
 
-    // 5️⃣ Send response
-    res.status(200).json({
-      page,
-      limit,
-      sortBy,
-      order: order === 1 ? "asc" : "desc",
-      totalCustomers,
-      totalPages: Math.ceil(totalCustomers / limit),
-      data: customers,
-    });
-  } catch (error) {
-    res.status(500).json({
-      message: "Failed to fetch customers",
-      error: error.message,
-    });
-  }
-});
+//     // 5️⃣ Send response
+//     res.status(200).json({
+//       page,
+//       limit,
+//       sortBy,
+//       order: order === 1 ? "asc" : "desc",
+//       totalCustomers,
+//       totalPages: Math.ceil(totalCustomers / limit),
+//       data: customers,
+//     });
+//   } catch (error) {
+//     res.status(500).json({
+//       message: "Failed to fetch customers",
+//       error: error.message,
+//     });
+//   }
+// });
 
 // ===============================
 // GET – Customers (Simple Fetch without Sort, Filter or Pagination)
 // ===============================
-// router.get("/", async (req, res) => {
-//   try {
-//     const customers = await Customer.find();
-//     res.json(customers);
-//   } catch (error) {
-//     res.status(500).json({
-//       message: "Failed to fetch customers",
-//       error: error,
-//     });
-//   }
-// });
+router.get("/", async (req, res) => {
+  try {
+    const customers = await Customer.find();
+    res.json(customers);
+  } catch (error) {
+    res.status(500).json({
+      message: "Failed to fetch customers",
+      error: error,
+    });
+  }
+});
 
 // ===============================
 // POST – Create Customer
