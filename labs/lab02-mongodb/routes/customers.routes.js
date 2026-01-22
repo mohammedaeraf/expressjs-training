@@ -1,6 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const Customer = require("../models/Customer");
+const validateCustomer = require("../middlewares/validateCustomer");
 
 // ===============================
 // GET – Customers (Pagination Only)
@@ -126,7 +127,7 @@ router.get("/", async (req, res) => {
 // ===============================
 // POST – Create Customer
 // ===============================
-router.post("/", async (req, res) => {
+router.post("/", validateCustomer, async (req, res) => {
   try {
     const customer = new Customer(req.body);
     const savedCustomer = await customer.save();
@@ -196,7 +197,7 @@ router.get("/:id", async (req, res) => {
 // ===============================
 // PUT – Update Customer
 // ===============================
-router.put("/:id", async (req, res) => {
+router.put("/:id", validateCustomer, async (req, res) => {
   try {
     const updatedCustomer = await Customer.findByIdAndUpdate(
       req.params.id,
