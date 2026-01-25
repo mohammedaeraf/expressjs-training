@@ -142,16 +142,28 @@ router.get("/search", async (req, res) => {
 // ===============================
 router.get("/", async (req, res) => {
   try {
-    const { email, phone } = req.query;
+    const { name, email, phone } = req.query;
 
     let filter = {};
 
+    if (name) {
+      filter.name = {
+        $regex: name,
+        $options: "i",
+      };
+    }
+
     if (email) {
-      filter.email = email;
+      filter.email = {
+        $regex: email,
+        $options: "i",
+      };
     }
 
     if (phone) {
-      filter.phone = phone;
+      filter.phone = {
+        $regex: phone,
+      };
     }
     console.log(filter);
 
