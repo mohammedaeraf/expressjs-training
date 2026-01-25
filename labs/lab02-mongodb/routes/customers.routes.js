@@ -138,7 +138,7 @@ router.get("/search", async (req, res) => {
 });
 
 // ===============================
-// GET – Customers (Simple Fetch without Sort, Filter or Pagination)
+// GET – Customers (With Search/Filter)
 // ===============================
 router.get("/", async (req, res) => {
   try {
