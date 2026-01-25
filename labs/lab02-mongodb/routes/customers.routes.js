@@ -109,12 +109,54 @@ const validateCustomer = require("../middlewares/validateCustomer");
 //   }
 // });
 
+// Code below for Search
+router.get("/search", async (req, res) => {
+  try {
+    const { email, phone } = req.query;
+
+    let filter = {};
+
+    if (email) {
+      filter.email = email;
+    }
+
+    if (phone) {
+      filter.phone = phone;
+    }
+
+    const customers = await Customer.find(filter);
+
+    res.status(200).json({
+      totalResults: customers.length,
+      data: customers,
+    });
+  } catch (error) {
+    res.status(500).json({
+      message: "Search failed",
+    });
+  }
+});
+
 // ===============================
 // GET – Customers (Simple Fetch without Sort, Filter or Pagination)
 // ===============================
 router.get("/", async (req, res) => {
   try {
-    const customers = await Customer.find();
+    const { email, phone } = req.query;
+
+    let filter = {};
+
+    if (email) {
+      filter.email = email;
+    }
+
+    if (phone) {
+      filter.phone = phone;
+    }
+    console.log(filter);
+
+    const customers = await Customer.find(filter);
+
     res.json(customers);
   } catch (error) {
     res.status(500).json({
@@ -143,34 +185,6 @@ router.post("/", validateCustomer, async (req, res) => {
     });
   }
 });
-
-// Code below for Search
-// router.get("/search", async (req, res) => {
-//   try {
-//     const { email, phone } = req.query;
-
-//     let filter = {};
-
-//     if (email) {
-//       filter.email = email;
-//     }
-
-//     if (phone) {
-//       filter.phone = phone;
-//     }
-
-//     const customers = await Customer.find(filter);
-
-//     res.status(200).json({
-//       totalResults: customers.length,
-//       data: customers,
-//     });
-//   } catch (error) {
-//     res.status(500).json({
-//       message: "Search failed",
-//     });
-//   }
-// });
 
 // ===============================
 // GET – Customer by ID
@@ -202,7 +216,7 @@ router.put("/:id", validateCustomer, async (req, res) => {
     const updatedCustomer = await Customer.findByIdAndUpdate(
       req.params.id,
       req.body,
-      { new: true, runValidators: true }
+      { new: true, runValidators: true },
     );
 
     if (!updatedCustomer) {
