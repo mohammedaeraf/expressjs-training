@@ -30,7 +30,27 @@ router.post("/", validateCustomer, async (req, res) => {
 router.get("/", async (req, res) => {
   try {
     // Retrieve all customers from the database using the Customer model's find method
-    const customers = await Customer.find();
+    const queryString = req.query;
+
+    let filter = {};
+    if (queryString.name) {
+      // wild card search
+      filter.name = {
+        $regex: queryString.name,
+        $options: "i",
+      };
+    }
+
+    if (queryString.email) {
+      // wild card search
+      filter.email = {
+        $regex: queryString.email,
+        $options: "i",
+      };
+    }
+
+    console.log(filter);
+    const customers = await Customer.find(filter);
     // Respond with the list of customers and a 200 OK status
     res.status(200).json(customers);
   } catch (error) {
