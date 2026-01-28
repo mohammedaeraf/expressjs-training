@@ -87,7 +87,7 @@ Customer.find().sort({ _id: -1 });
 
 ---
 
-## 🎓 One-Line Student Rule
+## 🎓 One-Line Rule
 
 > MongoDB does not guarantee any default sorting order.
 
@@ -109,8 +109,6 @@ Customer.find().sort({ _id: -1 });
 
 ---
 
-## 🔜 Teaching Tip
-
-Tell students:
+## 🔜 Important Tip
 
 > Pagination without explicit sorting is a bug, not a feature.
