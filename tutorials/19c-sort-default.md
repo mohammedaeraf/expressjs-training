@@ -1,8 +1,3 @@
-Good question 👍
-This is a **subtle but very important MongoDB behavior** that many beginners misunderstand.
-
----
-
 ## ❓ If we don’t provide any sort order, what is the default sorting?
 
 ### ✅ Short Answer
