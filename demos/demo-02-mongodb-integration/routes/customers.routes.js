@@ -1,118 +1,175 @@
+/**
+ * Customer Routes Module
+ *
+ * This file defines all RESTful API routes for customer-related operations.
+ * It handles CRUD (Create, Read, Update, Delete) operations for customers stored in MongoDB.
+ * Uses Mongoose ODM for data persistence and validation.
+ *
+ * Dependencies:
+ *   - express: Framework for building the API routes
+ *   - Customer: Mongoose model for interacting with the customers collection
+ *   - validateCustomer: Middleware to validate customer input data
+ */
+
 const express = require("express");
 const router = express.Router();
 const Customer = require("../models/Customer");
 const validateCustomer = require("../middlewares/validateCustomer");
 
-// This file defines the routes for customer-related operations in the Express.js application.
-// It handles CRUD (Create, Read, Update, Delete) operations for customers using MongoDB via Mongoose.
-// Each route uses async/await for handling asynchronous database operations.
-
-// ===============================
-// POST – Create Customer
-// ===============================
+/**
+ * POST /customers
+ * Create a new customer
+ *
+ * - Validates input data using validateCustomer middleware
+ * - Creates a new Customer document in MongoDB
+ * - Returns 201 Created with the new customer data
+ * - Returns 400 Bad Request if validation fails
+ */
 router.post("/", validateCustomer, async (req, res) => {
   try {
-    // Create a new Customer instance using the data from the request body
+    // Instantiate a new Customer with data from the request body
     const customer = new Customer(req.body);
-    // Save the customer to the MongoDB database
+    // Persist the customer to MongoDB database
     await customer.save();
-    // Respond with the created customer and a 201 Created status
+    // Return the created customer with HTTP 201 status
     res.status(201).json(customer);
   } catch (error) {
-    // If an error occurs (e.g., validation error), respond with a 400 Bad Request status and the error message
+    // Handle validation or database errors
     res.status(400).json({ error: error.message });
   }
 });
 
-// ===============================
-// GET – GET All Customers
-// ===============================
+/**
+ * GET /customers
+ * Retrieve all customers with optional filtering and sorting
+ *
+ * Query Parameters:
+ *   - name: Filter by customer name (case-insensitive regex search)
+ *   - email: Filter by customer email (case-insensitive regex search)
+ *   - sortBy: Field to sort by (default: "createdAt")
+ *   - order: Sort order - "asc" for ascending, anything else for descending (default: descending)
+ *
+ * Returns:
+ *   - 200 OK with array of customers and metadata (sortOrder, totalCount)
+ *   - 500 Internal Server Error if database query fails
+ */
 router.get("/", async (req, res) => {
   try {
-    // Retrieve all customers from the database using the Customer model's find method
+    // Extract query parameters for filtering and sorting
     const queryString = req.query;
 
+    // Build MongoDB filter object based on query parameters
     let filter = {};
+
+    // Name filter: case-insensitive regex search using MongoDB $regex operator
     if (queryString.name) {
-      // wild card search
       filter.name = {
         $regex: queryString.name,
-        $options: "i",
+        $options: "i", // "i" flag makes regex case-insensitive
       };
     }
 
+    // Email filter: case-insensitive regex search
     if (queryString.email) {
-      // wild card search
       filter.email = {
         $regex: queryString.email,
         $options: "i",
       };
     }
 
-    console.log(filter);
-    const customers = await Customer.find(filter);
-    // Respond with the list of customers and a 200 OK status
-    res.status(200).json(customers);
+    // Determine sort field and sort order (1 = ascending, -1 = descending)
+    const sortBy = req.query.sortBy || "createdAt";
+    const order = req.query.order == "asc" ? 1 : -1;
+
+    // Query database with filter and sort, then convert to array
+    const customers = await Customer.find(filter).sort({
+      [sortBy]: order,
+    });
+
+    // Return results with metadata about the query
+    res.status(200).json({
+      sortOrder: sortBy,
+      order: order === 1 ? "asc" : "desc",
+      totalCustomers: customers.length,
+      data: customers,
+    });
   } catch (error) {
-    // If an error occurs during the database query, respond with a 500 Internal Server Error status and the error message
+    // Handle database or query errors
     res.status(500).json({ error: error.message });
   }
 });
 
-// ===============================
-// GET – GET Customer by ID
-// ===============================
+/**
+ * GET /customers/:id
+ * Retrieve a specific customer by their MongoDB ObjectId
+ *
+ * URL Parameters:
+ *   - id: MongoDB ObjectId of the customer (must be valid 24-character hex string)
+ *
+ * Returns:
+ *   - 200 OK with the customer object
+ *   - 404 Not Found if customer doesn't exist
+ *   - 400 Bad Request if ID format is invalid
+ */
 router.get("/:id", async (req, res) => {
   try {
-    // Find a customer by their ID using the Customer model's findById method
-    // The ID is extracted from the URL parameters (req.params.id)
+    // Query MongoDB for a customer matching the provided ID
     const customer = await Customer.findById(req.params.id);
 
-    // If no customer is found with the given ID, return a 404 Not Found status
+    // If no customer found, return 404 error
     if (!customer) {
       return res.status(404).json({
         message: "Customer not found",
       });
     }
 
-    // If the customer is found, respond with the customer data and a 200 OK status
+    // Return the found customer document
     res.status(200).json(customer);
   } catch (error) {
-    // If an error occurs (e.g., invalid ObjectId format), respond with a 400 Bad Request status
+    // Handle invalid ObjectId format or other database errors
     res.status(400).json({
       message: "Invalid Customer ID",
     });
   }
 });
 
-// ===============================
-// PUT – Update Customer
-// ===============================
+/**
+ * PUT /customers/:id
+ * Update an existing customer
+ *
+ * - Validates updated data using validateCustomer middleware
+ * - Updates the customer document with new data
+ * - Runs Mongoose validators on the updated data
+ * - Returns 200 OK with updated customer object
+ * - Returns 404 Not Found if customer doesn't exist
+ * - Returns 400 Bad Request if validation fails or ID is invalid
+ */
 router.put("/:id", validateCustomer, async (req, res) => {
   try {
-    // Update the customer with the given ID using the data from the request body
-    // findByIdAndUpdate returns the updated document if 'new: true' is set
-    // runValidators: true ensures that Mongoose validators are run on the update
+    // Find and update the customer in a single atomic operation
+    // Options:
+    //   - new: true: Returns the updated document instead of the original
+    //   - runValidators: true: Runs Mongoose schema validators on the update
     const updatedCustomer = await Customer.findByIdAndUpdate(
       req.params.id,
       req.body,
       { new: true, runValidators: true },
     );
 
-    // If no customer is found with the given ID, return a 404 Not Found status
+    // If customer not found, return 404 error
     if (!updatedCustomer) {
       return res.status(404).json({
         message: "Customer not found",
       });
     }
 
-    // If the update is successful, respond with a success message and the updated customer data
+    // Return success response with the updated customer data
     res.status(200).json({
       message: "Customer updated successfully",
       data: updatedCustomer,
     });
   } catch (error) {
-    // If an error occurs (e.g., validation error or invalid ID), respond with a 400 Bad Request status
+    // Handle validation errors or invalid ObjectId format
     res.status(400).json({
       message: "Failed to update customer",
       error: error.message,
@@ -120,33 +177,43 @@ router.put("/:id", validateCustomer, async (req, res) => {
   }
 });
 
-// ===============================
-// DELETE – Customer
-// ===============================
+/**
+ * DELETE /customers/:id
+ * Delete a customer
+ *
+ * - Removes the customer document from MongoDB
+ * - Returns 200 OK with success message
+ * - Returns 404 Not Found if customer doesn't exist
+ * - Returns 400 Bad Request if ID format is invalid
+ */
 router.delete("/:id", async (req, res) => {
   try {
-    // Delete the customer with the given ID from the database
-    // findByIdAndDelete returns the deleted document if found
+    // Find and delete the customer in a single atomic operation
+    // Returns the deleted document if found, null if not found
     const deletedCustomer = await Customer.findByIdAndDelete(req.params.id);
 
-    // If no customer is found with the given ID, return a 404 Not Found status
+    // If customer not found, return 404 error
     if (!deletedCustomer) {
       return res.status(404).json({
         message: "Customer not found",
       });
     }
 
-    // If the deletion is successful, respond with a success message
+    // Return success response
     res.status(200).json({
       message: "Customer deleted successfully",
     });
   } catch (error) {
-    // If an error occurs (e.g., invalid ID format), respond with a 400 Bad Request status
+    // Handle invalid ObjectId format or other database errors
     res.status(400).json({
       message: "Invalid customer ID",
     });
   }
 });
 
-// Export the router so it can be used in other parts of the application (e.g., in server.js)
+/**
+ * Export the router module
+ * This router is used in server.js and mounted at a base path (e.g., /customers)
+ * making all routes accessible at /customers, /customers/:id, etc.
+ */
 module.exports = router;
