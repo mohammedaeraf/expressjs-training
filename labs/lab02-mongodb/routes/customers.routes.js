@@ -6,39 +6,39 @@ const validateCustomer = require("../middlewares/validateCustomer");
 // ===============================
 // GET – Customers (Pagination Only)
 // ===============================
-// router.get("/", async (req, res) => {
-//   try {
-//     // 1️⃣ Read query params
-//     const page = parseInt(req.query.page) || 1;
-//     const limit = parseInt(req.query.limit) || 10;
+router.get("/", async (req, res) => {
+  try {
+    // 1️⃣ Read query params
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
 
-//     // 2️⃣ Calculate skip value
-//     const skip = (page - 1) * limit;
+    // 2️⃣ Calculate skip value
+    const skip = (page - 1) * limit;
 
-//     // 3️⃣ Fetch paginated data
-//     const customers = await Customer.find()
-//       .skip(skip)
-//       .limit(limit)
-//       .sort({ _id: -1 });
+    // 3️⃣ Fetch paginated data
+    const customers = await Customer.find()
+      .skip(skip)
+      .limit(limit)
+      .sort({ _id: -1 });
 
-//     // 4️⃣ Get total count
-//     const totalCustomers = await Customer.countDocuments();
+    // 4️⃣ Get total count
+    const totalCustomers = await Customer.countDocuments();
 
-//     // 5️⃣ Send response
-//     res.status(200).json({
-//       page,
-//       limit,
-//       totalCustomers,
-//       totalPages: Math.ceil(totalCustomers / limit),
-//       data: customers,
-//     });
-//   } catch (error) {
-//     res.status(500).json({
-//       message: "Failed to fetch customers",
-//       error: error.message,
-//     });
-//   }
-// });
+    // 5️⃣ Send response
+    res.status(200).json({
+      page,
+      limit,
+      totalCustomers,
+      totalPages: Math.ceil(totalCustomers / limit),
+      data: customers,
+    });
+  } catch (error) {
+    res.status(500).json({
+      message: "Failed to fetch customers",
+      error: error.message,
+    });
+  }
+});
 
 // ===============================
 // GET – Customers (Sorting Only)
