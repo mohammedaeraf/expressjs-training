@@ -77,14 +77,24 @@ router.get("/", async (req, res) => {
       };
     }
 
+    // Pagination parameters
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+
+    // Calculate number of documents to skip for pagination
+    const skip = (page - 1) * limit;
+
     // Determine sort field and sort order (1 = ascending, -1 = descending)
     const sortBy = req.query.sortBy || "createdAt";
     const order = req.query.order == "asc" ? 1 : -1;
 
-    // Query database with filter and sort, then convert to array
-    const customers = await Customer.find(filter).sort({
-      [sortBy]: order,
-    });
+    // Query database with filter, pagination and sort, then convert to array
+    const customers = await Customer.find(filter)
+      .skip(skip)
+      .limit(limit)
+      .sort({
+        [sortBy]: order,
+      });
 
     // Return results with metadata about the query
     res.status(200).json({
