@@ -300,12 +300,3 @@ Response
 ## 🧠 Interview-Friendly Answer
 
 > Express API security involves validating input, protecting secrets, limiting requests, enabling secure headers, and controlling access.
-
----
-
-## 🔜 Next Topics (Natural Progression)
-
-* JWT Authentication
-* Role-based access control
-* Secure password storage
-* Production security checklist
