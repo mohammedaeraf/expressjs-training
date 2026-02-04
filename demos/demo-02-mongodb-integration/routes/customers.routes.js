@@ -17,7 +17,13 @@ const cors = require("cors");
 const router = express.Router();
 const Customer = require("../models/Customer");
 const validateCustomer = require("../middlewares/validateCustomer");
+const authMiddleware = require("../middlewares/authMiddleware");
+const rateLimit = require("express-rate-limit");
 
+const limiter = rateLimit({
+  windowMs: 3* 60 * 1000,
+  max: 50,
+});
 /**
  * POST /customers
  * Create a new customer
@@ -27,7 +33,7 @@ const validateCustomer = require("../middlewares/validateCustomer");
  * - Returns 201 Created with the new customer data
  * - Returns 400 Bad Request if validation fails
  */
-router.post("/", validateCustomer, async (req, res) => {
+router.post("/", validateCustomer, limiter, async (req, res) => {
   try {
     // Instantiate a new Customer with data from the request body
     const customer = new Customer(req.body);
@@ -55,7 +61,7 @@ router.post("/", validateCustomer, async (req, res) => {
  *   - 200 OK with array of customers and metadata (sortOrder, totalCount)
  *   - 500 Internal Server Error if database query fails
  */
-router.get("/", async (req, res) => {
+router.get("/", authMiddleware, async (req, res) => {
   try {
     // Extract query parameters for filtering and sorting
     const queryString = req.query;
@@ -156,7 +162,8 @@ router.get("/:id", async (req, res) => {
  * - Returns 404 Not Found if customer doesn't exist
  * - Returns 400 Bad Request if validation fails or ID is invalid
  */
-router.put("/:id", validateCustomer, async (req, res) => {
+
+router.put("/:id", authMiddleware, validateCustomer, async (req, res) => {
   try {
     // Find and update the customer in a single atomic operation
     // Options:

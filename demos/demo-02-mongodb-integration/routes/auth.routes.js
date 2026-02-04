@@ -25,7 +25,15 @@ router.post("/register", async (req, res) => {
   }
 });
 
-router.post("/login", async (req, res) => {
+const rateLimit = require("express-rate-limit");
+
+// only 3 attempts per hour
+const loginLimiter = rateLimit({
+  windowMs: 60 * 60 * 1000,
+  max: 3,
+});
+
+router.post("/login",  loginLimiter, async (req, res) => {
   try {
     const { email, password } = req.body;
 
@@ -60,6 +68,5 @@ router.get("/profile", authMiddleware, (req, res) => {
     user: req.user,
   });
 });
-
 
 module.exports = router;
