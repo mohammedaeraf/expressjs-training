@@ -2,8 +2,18 @@ const express = require("express");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const User = require("../models/User");
+const rateLimit = require("express-rate-limit");
 
 const router = express.Router();
+
+// Create limiter
+const limiter = rateLimit({
+  windowMs: 60 * 1000, // 1 minute
+  max: 5, // limit each IP to 5 requests
+  message: {
+    message: "Too many requests. Please try again later.",
+  },
+});
 
 router.post("/register", async (req, res) => {
   try {
@@ -25,7 +35,7 @@ router.post("/register", async (req, res) => {
   }
 });
 
-router.post("/login", async (req, res) => {
+router.post("/login", limiter, async (req, res) => {
   try {
     const { email, password } = req.body;
 
