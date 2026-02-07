@@ -15,7 +15,7 @@ const app = express();
 app.use(express.json({ limit: "10kb" }));
 
 // Secure HTTP headers (helps protect against some well-known web vulnerabilities)
-app.use(helmet());
+// app.use(helmet());
 
 // Enable CORS for specific origins used by the frontend(s)
 // Adjust the list as needed for production deployments
@@ -29,7 +29,7 @@ app.use(
 // Here we limit to 3 requests per minute per IP (tweak for your needs)
 const limiter = rateLimit({
   windowMs: 60 * 1000, // 1 minute
-  max: 3, // limit each IP to 3 requests per `windowMs`
+  max: 50, // limit each IP to 3 requests per `windowMs`
 });
 app.use(limiter);
 
