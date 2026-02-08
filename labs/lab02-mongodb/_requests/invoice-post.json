@@ -1,0 +1,9 @@
+{
+    "customer": "CUSTOMER_ID",
+    "items": [
+        {
+            "item": "ITEM_ID",
+            "quantity": 2
+        }
+    ]
+}

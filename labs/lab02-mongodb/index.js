@@ -15,11 +15,18 @@ mongoose
   .catch((err) => console.error("MongoDB error:", err));
 
 // Routes
-const customerRoutes = require("./routes/customers.routes");
-app.use("/customers", customerRoutes);
 
 const authRoutes = require("./routes/auth.routes");
 app.use("/auth", authRoutes);
+
+const customerRoutes = require("./routes/customers.routes");
+app.use("/customers", customerRoutes);
+
+const itemRoutes = require("./routes/items.routes");
+app.use("/items", itemRoutes);
+
+const invoiceRoutes = require("./routes/invoices.routes");
+app.use("/invoices", invoiceRoutes);
 
 app.listen(3000, () => {
   console.log("Server running on http://localhost:3000");
