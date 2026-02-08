@@ -5,7 +5,6 @@ const Invoice = require("../models/Invoice");
 const Customer = require("../models/Customer");
 const Item = require("../models/Item");
 
-
 // ==========================================
 // POST /invoices – Create Invoice
 // ==========================================
@@ -45,7 +44,7 @@ router.post("/", async (req, res) => {
         item: itemData._id,
         quantity: line.quantity,
         rate: itemData.rate,
-        amount
+        amount,
       });
 
       subTotal += amount;
@@ -59,21 +58,19 @@ router.post("/", async (req, res) => {
       items: invoiceItems,
       subTotal,
       taxTotal,
-      grandTotal
+      grandTotal,
     });
 
     const savedInvoice = await invoice.save();
 
     res.status(201).json({
       message: "Invoice created successfully",
-      data: savedInvoice
+      data: savedInvoice,
     });
-
   } catch (error) {
     res.status(500).json({ message: "Failed to create invoice" });
   }
 });
-
 
 // ==========================================
 // GET /invoices – Get All Invoices
@@ -82,7 +79,7 @@ router.get("/", async (req, res) => {
   try {
     const invoices = await Invoice.find()
       .populate("customer", "name email")
-      .populate("items.item", "name rate")
+      .populate("items.item", "name rate isTaxable taxPercentage")
       .sort({ createdAt: -1 });
 
     res.json(invoices);
@@ -91,7 +88,6 @@ router.get("/", async (req, res) => {
   }
 });
 
-
 // ==========================================
 // GET /invoices/:id – Get Invoice By ID
 // ==========================================
@@ -99,7 +95,7 @@ router.get("/:id", async (req, res) => {
   try {
     const invoice = await Invoice.findById(req.params.id)
       .populate("customer", "name email")
-      .populate("items.item", "name rate");
+      .populate("items.item", "name rate isTaxable taxPercentage");
 
     if (!invoice) {
       return res.status(404).json({ message: "Invoice not found" });
